@@ -17,8 +17,7 @@ try:
     with open('scaler.pkl', 'rb') as f:
         scaler = pickle.load(f)
     
-    # DEBUG: Check how many features the scaler expects
-    # This will help us confirm the number
+    # Display debug info in sidebar
     n_features_scaler = scaler.n_features_in_
     st.sidebar.write(f"📊 Scaler expects: {n_features_scaler} features")
 
@@ -86,14 +85,9 @@ with col1:
         format_func=lambda x: "No" if x == 0 else "Yes"
     )
     
-    Cold_Sweats = st.selectbox(
-        "Cold Sweats (0=No, 1=Yes)",
-        options=[0, 1],
-        format_func=lambda x: "No" if x == 0 else "Yes"
-    )
-    
-    Nausea = st.selectbox(
-        "Nausea (0=No, 1=Yes)",
+    # 🛑 CHANGED: Combined Cold Sweats and Nausea into ONE input
+    Cold_Sweats_Nausea = st.selectbox(
+        "Cold Sweats / Nausea (0=No, 1=Yes)",
         options=[0, 1],
         format_func=lambda x: "No" if x == 0 else "Yes"
     )
@@ -160,10 +154,10 @@ st.divider()
 
 # --- PREDICTION BUTTON ---
 if st.button("🔮 Predict Heart Disease Risk", type="primary"):
-    # CRITICAL: This order MUST exactly match the columns from your CSV (EXCLUDING 'Heart_Risk')
-    # The original CSV column order (from your file) was:
+    # 🛑 UPDATED: Now using EXACTLY 18 features (Cold_Sweats_Nausea is combined)
+    # This matches the columns in your CSV:
     # Chest_Pain, Shortness_of_Breath, Fatigue, Palpitations, Dizziness, Swelling,
-    # Pain_Areas_Back, Cold_Sweats, Nausea, High_BP, High_Cholesterol, Diabetes,
+    # Pain_Areas_Back, Cold_Sweats_Nausea, High_BP, High_Cholesterol, Diabetes,
     # Smoking, Obesity, Sedentary_Lifestyle, Family_History, Overt_Dress, Gender, Age
     
     input_features = [
@@ -174,8 +168,7 @@ if st.button("🔮 Predict Heart Disease Risk", type="primary"):
         Dizziness,
         Swelling,
         Pain_Areas_Back,
-        Cold_Sweats,
-        Nausea,
+        Cold_Sweats_Nausea,  # <-- Combined field
         High_BP,
         High_Cholesterol,
         Diabetes,
@@ -188,7 +181,7 @@ if st.button("🔮 Predict Heart Disease Risk", type="primary"):
         Age
     ]
     
-    # Print for debugging (this won't show in the web app, but helps us)
+    # Debug check (this shows in the Streamlit logs)
     print(f"Number of input features: {len(input_features)}")
     print(f"Input values: {input_features}")
     
@@ -231,11 +224,11 @@ if st.button("🔮 Predict Heart Disease Risk", type="primary"):
         st.error(f"❌ An error occurred during prediction: {e}")
         st.info("Please make sure all inputs are filled correctly.")
 
-# --- Show the number of features in the sidebar for debugging ---
+# --- Debug Info in Sidebar ---
 st.sidebar.markdown("---")
 st.sidebar.caption("Debug Info:")
 try:
     st.sidebar.write(f"📊 Scaler expects: {scaler.n_features_in_} features")
-    st.sidebar.write(f"📊 You are providing: {19} features")
+    st.sidebar.write(f"📊 You are providing: 18 features")
 except:
     pass
